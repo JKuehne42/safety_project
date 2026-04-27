@@ -1,23 +1,51 @@
 # Logs
-
+*.log
+logs/
 
 # Dependency directories
+node_modules/
+__pycache__/
+*.egg-info/
+dist/
+*.egg
 
 # Build output
-
+build/
+*.o
+*.so
+*.pyc
+*.pyo
 
 # Environment variables
-
+.env
+.env.local
 
 # IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 
-# large data files
-/home/jaboy/Documents/RBE575_Safety/safety_project/SDT_RL/decision-transformer/gym/data/halfcheetah-expert-v2.pkl
-/home/jaboy/Documents/RBE575_Safety/safety_project/SDT_RL/decision-transformer/gym/data/halfcheetah-medium-replay-v2.pkl
-/home/jaboy/Documents/RBE575_Safety/safety_project/SDT_RL/decision-transformer/gym/data/halfcheetah-medium-v2.pkl
-/home/jaboy/Documents/RBE575_Safety/safety_project/SDT_RL/decision-transformer/gym/data/hopper-expert-v2.pkl
-/home/jaboy/Documents/RBE575_Safety/safety_project/SDT_RL/decision-transformer/gym/data/hopper-medium-replay-v2.pkl
-/home/jaboy/Documents/RBE575_Safety/safety_project/SDT_RL/decision-transformer/gym/data/hopper-medium-v2.pkl
-/home/jaboy/Documents/RBE575_Safety/safety_project/SDT_RL/decision-transformer/gym/data/walker2d-expert-v2.pkl
-/home/jaboy/Documents/RBE575_Safety/safety_project/SDT_RL/decision-transformer/gym/data/walker2d-medium-replay-v2.pkl
-/home/jaboy/Documents/RBE575_Safety/safety_project/SDT_RL/decision-transformer/gym/data/walker2d-medium-v2.pkl
+# Large data files
+# Decision Transformer gym data
+SDT_RL/decision-transformer/gym/data/*.pkl
+SDT_RL/decision-transformer/gym/data/*.csv
+SDT_RL/decision-transformer/gym/wandb/
+
+# Atari datasets
+SDT_RL/decision-transformer/atari/data/
+
+# STLCG model files
+stlcg/examples/models/*.model
+stlcg/examples/models/*.npy
+stlcg/examples/models/*.mat
+
+# Common large file types
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+*.pt
+*.pth
+*.onnx
