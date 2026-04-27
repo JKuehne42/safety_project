@@ -1,0 +1,23 @@
+# Logs
+
+
+# Dependency directories
+
+# Build output
+
+
+# Environment variables
+
+
+# IDE files
+
+# large data files
+/home/jaboy/Documents/RBE575_Safety/safety_project/SDT_RL/decision-transformer/gym/data/halfcheetah-expert-v2.pkl
+/home/jaboy/Documents/RBE575_Safety/safety_project/SDT_RL/decision-transformer/gym/data/halfcheetah-medium-replay-v2.pkl
+/home/jaboy/Documents/RBE575_Safety/safety_project/SDT_RL/decision-transformer/gym/data/halfcheetah-medium-v2.pkl
+/home/jaboy/Documents/RBE575_Safety/safety_project/SDT_RL/decision-transformer/gym/data/hopper-expert-v2.pkl
+/home/jaboy/Documents/RBE575_Safety/safety_project/SDT_RL/decision-transformer/gym/data/hopper-medium-replay-v2.pkl
+/home/jaboy/Documents/RBE575_Safety/safety_project/SDT_RL/decision-transformer/gym/data/hopper-medium-v2.pkl
+/home/jaboy/Documents/RBE575_Safety/safety_project/SDT_RL/decision-transformer/gym/data/walker2d-expert-v2.pkl
+/home/jaboy/Documents/RBE575_Safety/safety_project/SDT_RL/decision-transformer/gym/data/walker2d-medium-replay-v2.pkl
+/home/jaboy/Documents/RBE575_Safety/safety_project/SDT_RL/decision-transformer/gym/data/walker2d-medium-v2.pkl
