@@ -24,6 +24,7 @@ class EvalConfig:
     max: bool = True
     device: str = "cpu"
     threads: int = 4
+    render_mode: str = "human"
 
 
 @pyrallis.wrap()
@@ -40,13 +41,15 @@ def eval(args: EvalConfig):
         import gymnasium as gym  # noqa
 
     env = wrap_env(
-        env=gym.make(cfg["task"]),
+        # env=gym.make(cfg["task"], render_mode=args.render_mode),
+        env=gym.make(cfg['task']),
         reward_scale=cfg["reward_scale"],
     )
-    env.reset()
     
     env = OfflineEnvWrapper(env)
     env.set_target_cost(cfg["cost_limit"])
+    env.reset()
+
 
     # model & optimizer & scheduler setup
     cdt_model = CDT(
