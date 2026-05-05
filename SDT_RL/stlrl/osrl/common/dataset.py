@@ -33,13 +33,13 @@ def discounted_cumsum(x: np.ndarray, gamma: float) -> np.ndarray:
     return cumsum
 
 
-def relabel_cost(cost: np.ndarray, threahold: int):
+def relabel_cost(cost: np.ndarray, threshold: int):
     new_cost = np.zeros_like(cost)
     consecutive_ones = 0
     for i in range(len(cost)):
         if cost[i] == 1.0:
             consecutive_ones += 1
-            new_cost[i] = 1.0 if consecutive_ones > threahold else 0
+            new_cost[i] = 1.0 if consecutive_ones > threshold else 0
         else:
             consecutive_ones = 0
             new_cost[i] = 0
@@ -414,8 +414,8 @@ def compute_robustness_trace(trajs: list,
                 cost_inputs_prefix = ((ya, ya), (va, va))
                 cost_inputs_suffix = ((ya_flip, ya_flip), (va_flip, va_flip))
             if "Jump" in task:
-                cost_inputs_prefix = ((xa, xa), (ya, ya), (za, za))
-                cost_inputs_suffix = ((xa_flip, xa_flip), (ya_flip, ya_flip), (za_flip, za_flip))
+                cost_inputs_prefix = ((za, za), (ya, ya), (ya, ya))
+                cost_inputs_suffix = ((za_flip, za_flip), (ya_flip, ya_flip), (xa_flip, xa_flip))
             
             # cost_rob_prefix
             cost_rob_prefix = ϕ_cost.forward(cost_inputs_prefix, pscale, scale)

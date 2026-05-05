@@ -38,28 +38,65 @@ def tensor_to_str(tensor):
     return str(tensor.numpy())
 
 def convert_to_input_values(inputs):
-    x_, y_ = inputs
-    if isinstance(x_, Expression):
-        assert x_.value is not None, "Input Expression does not have numerical values"
-        x_ret = x_.value
-    elif isinstance(x_, torch.Tensor):
-        x_ret = x_
-    elif isinstance(x_, tuple):
-        x_ret = convert_to_input_values(x_)
-    else:
-        raise ValueError("First argument is an invalid input trace")
+    try:
+        x_, y_ = inputs
 
-    if isinstance(y_, Expression):
-        assert y_.value is not None, "Input Expression does not have numerical values"
-        y_ret = y_.value
-    elif isinstance(y_, torch.Tensor):
-        y_ret = y_
-    elif isinstance(y_, tuple):
-        y_ret = convert_to_input_values(y_)
-    else:
-        raise ValueError("Second argument is an invalid input trace")
+        if isinstance(x_, Expression):
+            assert x_.value is not None, "Input Expression does not have numerical values"
+            x_ret = x_.value
+        elif isinstance(x_, torch.Tensor):
+            x_ret = x_
+        elif isinstance(x_, tuple):
+            x_ret = convert_to_input_values(x_)
+        else:
+            raise ValueError("First argument is an invalid input trace")
 
-    return (x_ret, y_ret)
+        if isinstance(y_, Expression):
+            assert y_.value is not None, "Input Expression does not have numerical values"
+            y_ret = y_.value
+        elif isinstance(y_, torch.Tensor):
+            y_ret = y_
+        elif isinstance(y_, tuple):
+            y_ret = convert_to_input_values(y_)
+        else:
+            raise ValueError("Second argument is an invalid input trace")
+
+        return (x_ret, y_ret)
+
+    except: # If more than x, y
+        x_, y_, z_ = inputs
+
+        if isinstance(x_, Expression):
+            assert x_.value is not None, "Input Expression does not have numerical values"
+            x_ret = x_.value
+        elif isinstance(x_, torch.Tensor):
+            x_ret = x_
+        elif isinstance(x_, tuple):
+            x_ret = convert_to_input_values(x_)
+        else:
+            raise ValueError("First argument is an invalid input trace")
+
+        if isinstance(y_, Expression):
+            assert y_.value is not None, "Input Expression does not have numerical values"
+            y_ret = y_.value
+        elif isinstance(y_, torch.Tensor):
+            y_ret = y_
+        elif isinstance(y_, tuple):
+            y_ret = convert_to_input_values(y_)
+        else:
+            raise ValueError("Second argument is an invalid input trace")
+        
+
+        if isinstance(y_, Expression):
+            assert z_.value is not None, "Input Expression does not have numerical values"
+            z_ret = z_.value
+        elif isinstance(y_, torch.Tensor):
+            z_ret = z_
+        elif isinstance(z_, tuple):
+            z_ret = convert_to_input_values(z_)
+        else:
+            raise ValueError("Second argument is an invalid input trace")
+        return (x_ret, y_ret, z_ret)
 
 
 class Maxish(torch.nn.Module):
