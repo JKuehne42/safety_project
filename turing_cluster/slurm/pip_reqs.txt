@@ -203,7 +203,6 @@ regex==2020.10.15
 requests==2.24.0
 requests-oauthlib==2.0.0
 rope==0.18.0
-Rtree==0.9.4
 ruamel-yaml==0.15.87
 sacremoses==0.1.1
 safety-gymnasium==0.4.0
