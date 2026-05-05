@@ -13,5 +13,6 @@
 #SBATCH --mail-user=jkuehne@wpi.edu 
 
 module load apptainer 
+module load python
 
 apptainer build --force box.sif ./apptainer_def.def

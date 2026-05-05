@@ -17,7 +17,7 @@ from panda_gym.envs.panda_tasks.panda_slide_safe import PandaSlideSafeEnv
 from panda_gym.envs.panda_tasks.panda_pick_and_place_safe import PandaPickAndPlaceSafeEnv
 from panda_gym.envs.panda_tasks.panda_stack_safe import PandaStackSafeEnv
 
-from gymnasium.envs.registration import register
+from gym.envs.registration import register
 
 with open(os.path.join(os.path.dirname(__file__), "version.txt"), "r") as file_handler:
     __version__ = file_handler.read().strip()

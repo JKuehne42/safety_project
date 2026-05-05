@@ -17,12 +17,17 @@ From: nvidia/cuda:11.8.0-cudnn8-devel-ubuntu20.04
 %post
     export DEBIAN_FRONTEND=noninteractive
 
+    # Replace HTTP with HTTPS in sources.list
+    sed -i 's|http://archive.ubuntu.com|https://archive.ubuntu.com|g' /etc/apt/sources.list
+    sed -i 's|http://security.ubuntu.com|https://security.ubuntu.com|g' /etc/apt/sources.list
+    
     apt-get update
     echo "apt install dependencies"
     apt-get install -y \
         build-essential \
         cmake \
         curl \
+        libcurl4-openssl-dev \
         libgl1-mesa-dev \
         libgl1-mesa-glx \
         libosmesa6-dev \
@@ -66,7 +71,9 @@ From: nvidia/cuda:11.8.0-cudnn8-devel-ubuntu20.04
     echo "Cloning repository"
     git clone https://github.com/JKuehne42/safety_project.git /root/workspace
 
+    echo "Installing pip requirements"
     cd /root/workspace/turing_cluster/slurm
+    pip install -r pip_reqs.txt
 
     pip install mujoco-py "Cython<3" 
 
@@ -88,7 +95,7 @@ EOF
 
     # Install Bullet Safety Gym requirements
     echo "Installing Bullet Safety Gym requirements"
-    cd /root/workspace/SDT_RL/Bullet-Safety-gym
+    cd /root/workspace/SDT_RL/Bullet-Safety-Gym
     python setup.py install
     python setup.py build   
 
@@ -104,9 +111,6 @@ EOF
     python setup.py install
     python setup.py build 
 
-    echo "Installing pip requirements"
-    cd /root/workspace/turing_cluster/slurm
-    pip install -r pip_reqs.txt
 
     # Install d4rl
     pip install git+https://github.com/Farama-Foundation/d4rl@master#egg=d4rl

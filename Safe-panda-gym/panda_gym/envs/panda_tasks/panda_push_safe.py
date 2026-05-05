@@ -16,8 +16,8 @@ class PandaPushSafeEnv(RobotTaskEnv):
             Defaults to "ee".
     """
 
-    def __init__(self, render: bool = False, reward_type: str = "dense", control_type: str = "ee") -> None:
-        sim = PyBullet(render=render)
+    def __init__(self, render_mode: bool = 'human', reward_type: str = "dense", control_type: str = "ee") -> None:
+        sim = PyBullet(render_mode=render_mode)
         robot = Panda(sim, block_gripper=True, base_position=np.array([-0.6, 0.0, 0.0]), control_type=control_type)
         task = Push(sim, reward_type="dense", get_ee_position=robot.get_ee_position)
         super().__init__(robot, task)
