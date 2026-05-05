@@ -275,6 +275,24 @@ register(
     ),
 )
 
+register(
+    id='SafetyAntJump-v0',
+    entry_point='bullet_safety_gym.envs.builder:EnvironmentBuilder',
+    max_episode_steps=200,
+    # apply_api_compatibility=True,
+    kwargs=dict(
+        agent='Ant',
+        task='JumpTask',
+        obstacles={},
+        world={
+            'name': 'Plane200',
+            'factor': 1
+        },
+        # debug=True
+    ),
+)
+
+
 # ===== Drone =====
 register(
     id='SafetyDroneRun-v0',

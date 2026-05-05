@@ -625,6 +625,109 @@ class RunTask(bases.Task):
         # no goals are present in the run task...
         pass
 
+class JumpTask(bases.Task):
+    """ A task where agents have to jump in the z-direction and are penalized
+        for crossing the safety boundaries.
+    """
+
+    def __init__(
+        self,
+        bc,
+        world,
+        agent,
+        obstacles,
+        use_graphics,
+    ):
+        super().__init__(
+            bc=bc,
+            world=world,
+            agent=agent,
+            obstacles=obstacles,
+            continue_after_goal_achievement=False,  # no goal present
+            use_graphics=use_graphics)
+        self.old_potential = 0.0  # used for shaped rewards
+
+        # spawn safety boundaries and rotate by 90°
+        self.y_lim = 2.
+        self.x_lim = 2.
+        self.bound_1 = LineBoundary(bc, init_xyz=(self.x_lim, -self.y_lim, 0))
+        self.bound_2 = LineBoundary(bc, init_xyz=(self.x_lim, self.y_lim, 0))
+        self.bound_3 = LineBoundary(bc, init_xyz=(-self.x_lim, -self.y_lim, 0))
+        self.bound_4 = LineBoundary(bc, init_xyz=(-self.x_lim, self.y_lim, 0))
+        quaternion = self.bc.getQuaternionFromEuler([0, 0., 0.5 * np.pi])
+        self.bound_1.set_orientation(quaternion)
+        self.bound_2.set_orientation(quaternion)
+        self.bound_3.set_orientation(quaternion)
+        self.bound_4.set_orientation(quaternion)
+
+
+    def calculate_cost(self):
+        """ determine costs depending on agent and obstacles
+        """
+        costs = {'cost_outside_bounds': 0}
+        if np.abs(self.agent.get_position()[1]) > self.y_lim or np.abs(self.agent.get_position()[0]) > self.x_lim:
+            costs['cost_outside_bounds'] = 1.
+
+        # sum all costs in one total cost
+        costs['cost'] = min(
+            1, sum(v for k, v in costs.items() if k.startswith('cost_')))
+        return costs
+
+    def calculate_task_potential(self) -> float:
+        """ Return euclidean distance to fictitious target position.
+        """
+        cur_xyz = self.agent.get_position()[:3]
+        goal_xyz = np.array([0, 0, 1e3])
+        return -np.linalg.norm(cur_xyz - goal_xyz) * 60
+
+    def calculate_reward(self):
+        progress = self.calculate_task_potential() - self.old_potential
+        self.old_potential = self.calculate_task_potential()
+        reward = progress + self.agent.specific_reward()
+        return reward
+
+    def get_collisions(self) -> int:
+        """Returns the number of collisions with obstacles that occurred after
+        the last simulation step call."""
+        if len(self.obstacles) == 0:
+            collision_list = []
+        else:
+            collision_list = [
+                ob.detect_collision(self.agent) for ob in self.obstacles
+            ]
+        return sum(collision_list)
+
+    def get_observation(self) -> np.ndarray:
+        # update camera position
+        agent_x = self.agent.get_position()[0]
+        self.world.camera.update(cam_base_pos=(agent_x + 3, 0, 2))
+        # no task specific observations...
+        return np.array([])
+
+    @property
+    def goal_achieved(self) -> bool:
+        """agent cannot reach goal: run endlessly"""
+        return False
+
+    def setup_camera(self) -> None:
+        """ Keep PyBullet's default camera setting."""
+        self.world.camera.update(cam_base_pos=(3., 0, 2),
+                                 cam_dist=2.5,
+                                 cam_yaw=90,
+                                 cam_pitch=-50)
+
+    def specific_reset(self) -> None:
+        """ Set positions and orientations of agent and obstacles."""
+        self.agent.specific_reset()  # reset joints
+        new_pos = self.agent.init_xyz
+        new_pos[:2] = np.random.uniform(-0.01, 0.01, 2)
+        self.agent.set_position(new_pos)
+        self.old_potential = self.calculate_task_potential()
+
+    def update_goal(self) -> None:
+        # no goals are present in the run task...
+        pass
+
 
 class GatherTask(bases.Task):
 

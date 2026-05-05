@@ -87,6 +87,8 @@ import mujoco_py
 print("mujoco_py successfully compiled!")
 EOF
 
+    # Install d4rl
+    pip install git+https://github.com/Farama-Foundation/d4rl@master#egg=d4rl
 
     # Install Bullet Safety Gym requirements
     echo "Installing Bullet Safety Gym requirements"
@@ -109,6 +111,11 @@ EOF
     # python setup.py build 
     pip install -e .
 
+    # Install DSRL requirements
+    echo "Installing DSRL requirements"
+    cd /root/workspace/DSRL
+    pip install -e .
+
     pip install 'OApackage<2.7' 'numpy<2.0'
     pip install IPython
     pip install stlpy
@@ -117,8 +124,5 @@ EOF
     # cd /root/workspace/turing_cluster/slurm
     # pip install -r pip_reqs.txt
 
-    # Install d4rl
-    pip install git+https://github.com/Farama-Foundation/d4rl@master#egg=d4rl
-    
 %runscript
     exec /bin/bash

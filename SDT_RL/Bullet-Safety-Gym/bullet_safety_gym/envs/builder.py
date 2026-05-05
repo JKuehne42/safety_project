@@ -73,7 +73,7 @@ def get_physics_parameters(task: str, agent: str) -> tuple:
         If no class is found for task name.
     """
     assert hasattr(tasks, task), f'Task={task} not implemented.'
-    if task in ['RunTask', 'GatherTask']:
+    if task in ['RunTask', 'GatherTask', 'JumpTask']:
         # the physics parameters are identically to PyBullet locomotion envs
         time_step = 1 / 120.
         frame_skip = 4

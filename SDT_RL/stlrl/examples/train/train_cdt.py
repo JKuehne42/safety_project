@@ -52,8 +52,10 @@ def train(args: CDTTrainConfig):
 
     # initialize environment
     if "Metadrive" in args.task:
+        print("importing gym")
         import gym
     else:
+        print("importing gymnasium")
         import gymnasium as gym  # noqa
     env = gym.make(args.task)
     env.reset()
@@ -98,6 +100,7 @@ def train(args: CDTTrainConfig):
             ϕ_xa = And(LessThan(lhs='xa', val=x_lim), GreaterThan(lhs='xa', val=-x_lim))
 
             # ϕ_cost = Always(Implies(Negation(ϕ_xa), Eventually(ϕ_xa, interval=[1, 5])))
+            # Always (not in the boundary implies in the next 5 time steps will be in the boundary)
             ϕ_cost = Always(Implies(Negation(ϕ_xa), Eventually(ϕ_xa, [1, threshold])))
             ϕ_reward = None
             
@@ -109,8 +112,38 @@ def train(args: CDTTrainConfig):
             ϕ_va = LessThan(lhs="va", val=v_lim[args.task])
             # And(Eventually(φ_va, [1, 5]), Always(φ_va, [1, 10]))
             
+            # Always ([in the boundary] and (not within allowed velocity implies will be within allowed velocity in the next 5 time steps))
             ϕ_cost = Always(And(φ_ya, Implies(Negation(φ_va), Eventually(φ_va, [1, threshold]))))
             ϕ_reward = None
+
+        if "Jump" in args.task:
+            threshold = 10
+
+            # Safety boundaries. Stay within this specific square
+            y_outer_lim = 0.2 * 2
+            x_outer_lim = 0.2 * 2
+            ϕ_outer_ya = And(LessThan(lhs='ya', val=y_outer_lim), GreaterThan(lhs='ya', val=-y_outer_lim))
+            ϕ_outer_xa = And(LessThan(lhs='xa', val=x_outer_lim), GreaterThan(lhs='xa', val=-x_outer_lim))
+            
+            y_inner_lim = 0.05 * 2
+            x_inner_lim = 0.05 * 2
+            ϕ_inner_ya = And(LessThan(lhs='ya', val=y_inner_lim), GreaterThan(lhs='ya', val=-y_inner_lim))
+            ϕ_inner_xa = And(LessThan(lhs='xa', val=x_inner_lim), GreaterThan(lhs='xa', val=-x_inner_lim))
+
+            # The ant starts centered at 0.25. If it reaches 0, it dies. Prevent this from happening with wiggle room
+            z_min = 0.05
+            ϕ_za = LessThan(lhs="za", val=z_min)
+
+            # Always (Not less than minimum height and ([in the outer boundary] and (not in the inner boundary implies will be in the inner boundary in the next 10 time steps)))
+            ϕ_cost = Always(And(Negation(ϕ_za), And( And(ϕ_outer_ya, ϕ_outer_xa), Implies(Negation( And(ϕ_inner_ya, ϕ_inner_xa)), Eventually(And(ϕ_inner_ya, ϕ_inner_xa), [1, threshold])))))
+            
+            # GreaterThan(lhs="va", val=0.1), [1, threshold]
+            desired_za = 0.001
+            ϕ_in_air = GreaterThan(lhs='za', val=desired_za)
+
+            # reward is included in the task initialization
+            ϕ_reward = None 
+
 
     use_rew_rob = args.use_rew_suffix or args.use_rew_prefix
     use_cost_rob = args.use_cost_suffix or args.use_cost_prefix
@@ -188,6 +221,9 @@ def train(args: CDTTrainConfig):
             cost_transform = lambda x: x + 0.15
         if "Run" in args.task:
             cost_transform = lambda x: x + 0.3
+        if "Jump" in args.task:
+            cost_transform = lambda x: x + 0.3
+
 
     dataset = SequenceDataset(
         data,

@@ -126,6 +126,22 @@ class CDTAntRunConfig(CDTTrainConfig):
     max_rew_decrease: float = 150
     device: str = "cuda:0"
 
+@dataclass
+class CDTAntJumpConfig(CDTTrainConfig):
+    # model params
+    seq_len: int = 10
+    episode_len: int = 200
+    # training params
+    task: str = "OfflineAntJump-v0"
+    target_returns: Tuple[Tuple[float, ...],
+                          ...] = ((680.0, 0.05), (700.0, 0.05), (720.0, 0.05))
+    # augmentation param
+    deg: int = 3
+    max_reward: float = 1000.0
+    max_rew_decrease: float = 150
+    device: str = "cuda:0"
+
+
 
 @dataclass
 class CDTDroneRunConfig(CDTTrainConfig):
@@ -733,6 +749,8 @@ class CDTHardDenseConfig(CDTTrainConfig):
     device: str = "cuda:0"
 
 
+
+
 CDT_DEFAULT_CONFIG = {
     # bullet_safety_gym
     "OfflineCarCircle-v0": CDTCarCircleConfig,
@@ -776,5 +794,8 @@ CDT_DEFAULT_CONFIG = {
     "OfflineMetadrive-mediumdense-v0": CDTMediumDenseConfig,
     "OfflineMetadrive-hardsparse-v0": CDTHardSparseConfig,
     "OfflineMetadrive-hardmean-v0": CDTHardMeanConfig,
-    "OfflineMetadrive-harddense-v0": CDTHardDenseConfig
+    "OfflineMetadrive-harddense-v0": CDTHardDenseConfig,
+
+    # Safety Project
+    "OfflineAntJump-v0":CDTAntJumpConfig
 }
