@@ -56,7 +56,6 @@ From: nvidia/cuda:11.8.0-cudnn8-devel-ubuntu20.04
     apt-get autoremove -y
 
     echo "install mujoco"
-    # TODO verify version
     mkdir -p /root/mujoco
     curl -L https://github.com/deepmind/mujoco/releases/download/2.1.0/mujoco210-linux-x86_64.tar.gz \
         -o /root/mujoco/mujoco210.tar.gz
@@ -71,15 +70,13 @@ From: nvidia/cuda:11.8.0-cudnn8-devel-ubuntu20.04
     echo "Cloning repository"
     git clone https://github.com/JKuehne42/safety_project.git /root/workspace
 
-    echo "Installing pip requirements"
-    cd /root/workspace/turing_cluster/slurm
-    pip install -r pip_reqs.txt
 
     pip install mujoco-py "Cython<3" 
 
-    # pip install torch==2.0.0 torchvision==0.15.0 torchaudio==2.0.0 \
-    # --index-url https://download.pytorch.org/whl/cu118
-
+    # For CUDA 11.7 (which works with CUDA 11.8)
+    pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117 torchaudio==0.13.1 \
+    -f https://download.pytorch.org/whl/torch_stable.html
+    
     cd /tmp
 
     python3 << 'EOF'
@@ -90,27 +87,34 @@ import mujoco_py
 print("mujoco_py successfully compiled!")
 EOF
 
-    # used to be 3.2.3
-    pip install mujoco==2.3.0
 
     # Install Bullet Safety Gym requirements
     echo "Installing Bullet Safety Gym requirements"
     cd /root/workspace/SDT_RL/Bullet-Safety-Gym
-    python setup.py install
-    python setup.py build   
+    # python setup.py install
+    # python setup.py build   
+    pip install -e .
 
     # Install SDT requirements
     echo "Installing SDT requirements"
     cd /root/workspace/SDT_RL/stlrl
-    python setup.py install
-    python setup.py build
+    # python setup.py install
+    # python setup.py build
+    pip install -e .
 
     # Install STL requirements
     echo "Installing STL requirements"
     cd /root/workspace/stlcg
-    python setup.py install
-    python setup.py build 
+    # python setup.py install
+    # python setup.py build 
+    pip install -e .
 
+    pip install 'OApackage<2.7' 'numpy<2.0'
+    pip install IPython
+
+    echo "Installing pip requirements"
+    cd /root/workspace/turing_cluster/slurm
+    pip install -r pip_reqs.txt
 
     # Install d4rl
     pip install git+https://github.com/Farama-Foundation/d4rl@master#egg=d4rl

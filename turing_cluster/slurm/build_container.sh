@@ -7,7 +7,7 @@
 #SBATCH --error=container_setup_error.txt             # Standard error file
 #SBATCH --nodes=1                     # Number of nodes
 #SBATCH --ntasks-per-node=1           # Number of tasks per node
-#SBATCH --cpus-per-task=50             # Number of CPU cores per task
+#SBATCH --cpus-per-task=60             # Number of CPU cores per task
 #SBATCH --time=01:00:00                # Maximum runtime (D-HH:MM:SS)
 #SBATCH --mail-type=END               # Send email at job completion
 #SBATCH --mail-user=jkuehne@wpi.edu 
