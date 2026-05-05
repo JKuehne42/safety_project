@@ -90,6 +90,11 @@ EOF
     # Install d4rl
     pip install git+https://github.com/Farama-Foundation/d4rl@master#egg=d4rl
 
+    # Install DSRL requirements
+    echo "Installing DSRL requirements"
+    cd /root/workspace/DSRL
+    pip install -e .
+
     # Install Bullet Safety Gym requirements
     echo "Installing Bullet Safety Gym requirements"
     cd /root/workspace/SDT_RL/Bullet-Safety-Gym
@@ -111,18 +116,10 @@ EOF
     # python setup.py build 
     pip install -e .
 
-    # Install DSRL requirements
-    echo "Installing DSRL requirements"
-    cd /root/workspace/DSRL
-    pip install -e .
 
     pip install 'OApackage<2.7' 'numpy<2.0'
     pip install IPython
     pip install stlpy
-
-    echo "Installing pip requirements"
-    # cd /root/workspace/turing_cluster/slurm
-    # pip install -r pip_reqs.txt
 
 %runscript
     exec /bin/bash

@@ -387,6 +387,7 @@ def compute_robustness_trace(trajs: list,
             va = torch.tensor(va, requires_grad=False).reshape([1, va.shape[0], 1])
             ya_flip = ya.flip(1)
             va_flip = va.flip(1)
+            
         if "Jump" in task:
             # Extract x, y, z positions from Ant observations
             xa = obs[:, 0]  # x position
@@ -414,7 +415,7 @@ def compute_robustness_trace(trajs: list,
                 cost_inputs_prefix = ((ya, ya), (va, va))
                 cost_inputs_suffix = ((ya_flip, ya_flip), (va_flip, va_flip))
             if "Jump" in task:
-                cost_inputs_prefix = ((za, za), (ya, ya), (ya, ya))
+                cost_inputs_prefix = ((za, za), (ya, ya), (xa, xa))
                 cost_inputs_suffix = ((za_flip, za_flip), (ya_flip, ya_flip), (xa_flip, xa_flip))
             
             # cost_rob_prefix

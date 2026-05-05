@@ -64,6 +64,9 @@ def convert_to_input_values(inputs):
         return (x_ret, y_ret)
 
     except: # If more than x, y
+
+        print("More than 2 dimensions in input")
+
         x_, y_, z_ = inputs
 
         if isinstance(x_, Expression):
@@ -95,7 +98,7 @@ def convert_to_input_values(inputs):
         elif isinstance(z_, tuple):
             z_ret = convert_to_input_values(z_)
         else:
-            raise ValueError("Second argument is an invalid input trace")
+            raise ValueError("Third argument is an invalid input trace")
         return (x_ret, y_ret, z_ret)
 
 
