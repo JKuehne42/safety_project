@@ -141,8 +141,6 @@ nvidia-cuda-nvrtc-cu11==11.7.99
 nvidia-cuda-runtime-cu11==11.7.99
 nvidia-cudnn-cu11==8.5.0.96
 nvidia-ml-py3==7.352.0
-OApackage==2.7.6
-oauthlib==3.3.1
 olefile==0.46
 openpyxl==3.0.5
 osrl-lib==0.1.0
