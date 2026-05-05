@@ -111,10 +111,11 @@ EOF
 
     pip install 'OApackage<2.7' 'numpy<2.0'
     pip install IPython
+    pip install stlpy
 
     echo "Installing pip requirements"
-    cd /root/workspace/turing_cluster/slurm
-    pip install -r pip_reqs.txt
+    # cd /root/workspace/turing_cluster/slurm
+    # pip install -r pip_reqs.txt
 
     # Install d4rl
     pip install git+https://github.com/Farama-Foundation/d4rl@master#egg=d4rl
