@@ -14,5 +14,7 @@
 
 module load apptainer 
 module load python
+module load py-setuptools
+
 
 apptainer build --force box.sif ./apptainer_def.def
