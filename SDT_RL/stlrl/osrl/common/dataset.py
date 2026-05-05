@@ -66,6 +66,8 @@ def relabel_cost_run(obs: np.ndarray, task: str, threshold: int=5):
     new_cost = np.min([np.ones_like(cost_bound), cost_bound + new_cost_vel], axis=0)
     return new_cost
 
+    
+
 def process_rvs_dataset(dataset: dict, reward_scale: float=1.0, cost_scale: float=1.0,
                         gamma: float=1.0, label_cost: bool=False, 
                         spec: STL_Formula=None, rvs_mode: str="", task: str=None):
@@ -209,6 +211,8 @@ def process_bc_dataset(dataset: dict, cost_limit: float, gamma: float,
             if "Run" in task:
                 dataset["costs"][start:end] = relabel_cost_run(
                     dataset["observations"][start:end, :], task)
+            if "Jump" in task:
+                null
 
         cost_returns = discounted_cumsum(dataset["costs"][start:end], gamma=gamma)
         reward_returns = discounted_cumsum(dataset["rewards"][start:end], gamma=gamma)
@@ -315,6 +319,8 @@ def process_sequence_dataset(dataset: dict, cost_reverse: bool = False, task: st
                 episode_data["costs"] = relabel_cost(episode_data["costs"], 5)
             if "Run" in task:
                 episode_data["costs"] = relabel_cost_run(episode_data["observations"], task)
+            if "Jump" in task:
+                episode_data["costs"] = relabel_cost(episode_data["costs"], 10)
 
             episode_data["returns"] = discounted_cumsum(episode_data["rewards"], gamma=1)
             episode_data["cost_returns"] = discounted_cumsum(episode_data["costs"], gamma=1)
@@ -381,6 +387,21 @@ def compute_robustness_trace(trajs: list,
             va = torch.tensor(va, requires_grad=False).reshape([1, va.shape[0], 1])
             ya_flip = ya.flip(1)
             va_flip = va.flip(1)
+        if "Jump" in task:
+            # Extract x, y, z positions from Ant observations
+            xa = obs[:, 0]  # x position
+            ya = obs[:, 1]  # y position
+            za = obs[:, 2]  # z position (height)
+            
+            # Convert to tensors
+            xa = torch.tensor(xa, requires_grad=False).reshape([1, xa.shape[0], 1])
+            ya = torch.tensor(ya, requires_grad=False).reshape([1, ya.shape[0], 1])
+            za = torch.tensor(za, requires_grad=False).reshape([1, za.shape[0], 1])
+            
+            # Create flipped versions for suffix computation
+            xa_flip = xa.flip(1)
+            ya_flip = ya.flip(1)
+            za_flip = za.flip(1)
         
         if ϕ_reward is not None:
             pass
@@ -392,6 +413,9 @@ def compute_robustness_trace(trajs: list,
             if "Run" in task:
                 cost_inputs_prefix = ((ya, ya), (va, va))
                 cost_inputs_suffix = ((ya_flip, ya_flip), (va_flip, va_flip))
+            if "Jump" in task:
+                cost_inputs_prefix = ((xa, xa), (ya, ya), (za, za))
+                cost_inputs_suffix = ((xa_flip, xa_flip), (ya_flip, ya_flip), (za_flip, za_flip))
             
             # cost_rob_prefix
             cost_rob_prefix = ϕ_cost.forward(cost_inputs_prefix, pscale, scale)
