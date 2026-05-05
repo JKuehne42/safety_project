@@ -84,7 +84,7 @@ EOF
     # used to be 3.2.3
     pip install mujoco==2.3.0
 
-    # Intall Bullet Safety Gym requirements
+    # Install Bullet Safety Gym requirements
     cd /root/workspace/SDT_RL/Bullet-Safety-gym
     python setup.py install
     python setup.py build   
@@ -99,6 +99,7 @@ EOF
     python setup.py install
     python setup.py build 
     
+    cd /root/workspace/turing_cluster/slurm
     pip install -r pip_reqs.txt
 
     # Install d4rl
