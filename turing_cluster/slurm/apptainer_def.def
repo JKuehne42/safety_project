@@ -1,0 +1,107 @@
+Bootstrap: docker
+From: nvidia/cuda:11.8.0-cudnn8-devel-ubuntu20.04
+
+%environment
+    export MUJOCO_GL=osmesa
+    export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
+
+    export MUJOCO_PY_MUJOCO_PATH=/root/mujoco/mujoco210
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/root/mujoco/mujoco210/bin
+    
+    export MUJOCO_PY_MJPRO_PATH=/root/mujoco/mujoco210
+    export MUJOCO_PY_BUILD_DIR=/root/mujoco_py_build
+    export MUJOCO_PY_FORCE_CPU=1
+    export C_INCLUDE_PATH=/usr/include
+    export APPTAINERENV_MUJOCO_GL=osmesa
+
+%post
+    export DEBIAN_FRONTEND=noninteractive
+
+    apt-get update
+    apt-get install -y \
+        build-essential \
+        cmake \
+        curl \
+        libgl1-mesa-dev \
+        libgl1-mesa-glx \
+        libosmesa6-dev \
+        libosmesa6 \
+        libglew-dev \
+        libglfw3 \
+        libglfw3-dev \
+        libwayland-dev \
+        libxinerama-dev \
+        libxcursor-dev \
+        libxkbcommon-dev \
+        libxrandr-dev \
+        libxi-dev \
+        libosmesa6-dev \
+        ninja-build \
+        git \
+        pkg-config \
+        vim \
+        wget \
+        patchelf \
+        python3.8 \
+        python3.8-dev \
+        python3-pip
+
+    apt-get clean
+    apt-get autoremove -y
+
+    # TODO verify version
+    mkdir -p /root/mujoco
+    curl -L https://github.com/deepmind/mujoco/releases/download/2.1.0/mujoco210-linux-x86_64.tar.gz \
+        -o /root/mujoco/mujoco210.tar.gz
+    tar -xzf /root/mujoco/mujoco210.tar.gz -C /root/mujoco/
+    rm /root/mujoco/mujoco210.tar.gz
+
+    export MUJOCO_PY_MUJOCO_PATH=/root/mujoco/mujoco210
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/root/mujoco/mujoco210/bin
+    export MUJOCO_GL=osmesa
+    export MUJOCO_PY_FORCE_CPU=1
+
+    git clone https://github.com/JKuehne42/safety_project.git /root/workspace
+
+    cd /root/workspace/turing_cluster/slurm
+
+    pip install -r pip_reqs.txt
+
+    pip install mujoco-py "Cython<3" 
+
+    # pip install torch==2.0.0 torchvision==0.15.0 torchaudio==2.0.0 \
+    # --index-url https://download.pytorch.org/whl/cu118
+
+    cd /tmp
+
+    python3 << 'EOF'
+import os
+os.environ['MUJOCO_PY_MUJOCO_PATH'] = '/root/mujoco/mujoco210'
+os.environ['MUJOCO_GL'] = 'osmesa'
+import mujoco_py
+print("mujoco_py successfully compiled!")
+EOF
+
+    # used to be 3.2.3
+    pip install mujoco==2.3.0
+
+    # Intall Bullet Safety Gym requirements
+    cd /root/workspace/SDT_RL/Bullet-Safety-gym
+    python setup.py install
+    python setup.py build   
+
+    # Install SDT requirements
+    cd /root/workspace/SDT_RL/stlrl
+    python setup.py install
+    python setup.py build
+
+    # Install STL requirements
+    cd /root/workspace/stlcg
+    python setup.py install
+    python setup.py build 
+
+    # Install d4rl
+    pip install git+https://github.com/Farama-Foundation/d4rl@master#egg=d4rl
+    
+%runscript
+    exec /bin/bash
