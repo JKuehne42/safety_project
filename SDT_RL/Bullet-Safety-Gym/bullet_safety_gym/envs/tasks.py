@@ -672,6 +672,7 @@ class JumpTask(bases.Task):
         costs['cost'] = min(
             1, sum(v for k, v in costs.items() if k.startswith('cost_')))
         return costs
+    
 
     def calculate_task_potential(self) -> float:
         """ Return euclidean distance to fictitious target position.

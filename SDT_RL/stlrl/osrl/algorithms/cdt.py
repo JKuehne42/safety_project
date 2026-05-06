@@ -547,6 +547,14 @@ class CDTTrainer:
                 ya = ya.reshape([1, ya.shape[0], 1])
                 va = va.reshape([1, va.shape[0], 1])
 
+            if "Jump" in task:
+                za = eval_obs[:, 0]
+                ya = eval_obs[:, 1]
+                xa = eval_obs[:, 2]
+                za = za.reshape([1, za.shape[0], 1])
+                ya = ya.reshape([1, ya.shape[0], 1])
+                xa = xa.reshape([1, xa.shape[0], 1])
+
             if use_rew_prefix:
                 pass
             if use_cost_prefix:
@@ -554,6 +562,8 @@ class CDTTrainer:
                     cost_inputs = ((xa, xa), ((xa, xa)))
                 if "Run" in task:
                     cost_inputs = ((ya, ya), (va, va))
+                if "Jump" in task:
+                    cost_inputs = (za, ((ya, ya), (xa, xa)))
                 cost_rob = ϕ_cost.robustness(cost_inputs, scale=self.rob_scale)
                 cost_rob_prefix[:, step] = cost_rob[0, 0, 0]
                 # cost_rob = ϕ_cost.forward(cost_inputs, scale=self.rob_scale)
@@ -592,6 +602,11 @@ class CDTTrainer:
                     new_cost = 0
                 cost_vel = new_cost
                 cost = np.min([1, cost_bound + cost_vel]) * self.cost_scale
+            if "Jump" in task:
+                # Jump task: check height and boundary constraints
+                cost_height = info.get("cost_height_violation", 0.0)
+                cost_bounds = info.get("cost_outside_bounds", 0.0)
+                cost = np.min([1, cost_height + cost_bounds]) * self.cost_scale
             
             # at step t, we predict a_t, get s_{t + 1}, r_{t + 1}
             actions[:, step] = torch.as_tensor(act)

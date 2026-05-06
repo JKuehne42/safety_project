@@ -138,7 +138,7 @@ def train(args: CDTTrainConfig):
 
             # Always (Not less than minimum height and ([in the outer boundary] and (not in the inner boundary implies will be in the inner boundary in the next 10 time steps)))
             # ϕ_cost = Always(And(Negation(ϕ_za), And( And(ϕ_outer_ya, ϕ_outer_xa), Implies(Negation( And(ϕ_inner_ya, ϕ_inner_xa)), Eventually(And(ϕ_inner_ya, ϕ_inner_xa), [1, threshold])))))
-            Always(And(Negation(ϕ_za), And(ϕ_outer_ya, ϕ_outer_xa)))
+            ϕ_cost = Always(And(Negation(ϕ_za), And(ϕ_outer_ya, ϕ_outer_xa)))
 
             # GreaterThan(lhs="va", val=0.1), [1, threshold]
             desired_za = 0.001

@@ -37,7 +37,7 @@ apptainer exec --userns --nv \
   --bind ${PROJECT_DIR}/mujoco_py_writable:/usr/local/lib/python3.8/dist-packages/mujoco_py \
   ${PROJECT_DIR}/turing_cluster/slurm/box.sif \
   bash -c "yes | python3 /root/workspace/SDT_RL/stlrl/examples/train/train_cdt.py \
-  --task 'OfflineAntRun-v0' \
+  --task 'OfflineAntJump-v0' \
   --use_cost_prefix True \
   --use_cost_suffix True \
   --reward_scale 0.001 \
