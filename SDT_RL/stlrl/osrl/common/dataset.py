@@ -49,7 +49,28 @@ def relabel_cost_run(obs: np.ndarray, task: str, threshold: int=5):
     v_lim = {"OfflineAntRun-v0": 0.45, 
              "OfflineBallRun-v0": 0.5, 
              "OfflineCarRun-v0": 1.5, 
-             "OfflineDroneRun-v0": 0.3}
+             "OfflineDroneRun-v0": 0.3,
+             "OfflineAntJump-v0": 0.45}
+    
+    # Handle Jump task separately (different constraints)
+    if "Jump" in task:
+        # For Jump task, we care about height (z), position bounds (x, y)
+        za = obs[:, 0]
+        ya = obs[:, 1]
+        xa = obs[:, 2]
+        
+        # Minimum height constraint (z_min = 0.05)
+        cost_height = np.zeros(obs.shape[0], dtype=obs.dtype)
+        cost_height[za < 0.05] = 1.0
+        
+        # Boundary constraints
+        y_outer_lim = 0.2 * 2
+        x_outer_lim = 0.2 * 2
+        cost_bound = np.zeros_like(cost_height)
+        cost_bound[(np.abs(ya) > y_outer_lim) | (np.abs(xa) > x_outer_lim)] = 1.0
+        
+        new_cost = np.min([np.ones_like(cost_height), cost_height + cost_bound], axis=0)
+        return new_cost
     
     xdot = 2; ydot = 3
     if "Drone" in task or "Ant" in task:
@@ -103,6 +124,7 @@ def process_rvs_dataset(dataset: dict, reward_scale: float=1.0, cost_scale: floa
             if "Run" in task:
                 dataset["costs"][start:end] = relabel_cost_run(
                     dataset["observations"][start:end, :], task)
+            
 
         cost_returns = discounted_cumsum(dataset["costs"][start:end], gamma=gamma)
         reward_returns = discounted_cumsum(dataset["rewards"][start:end], gamma=gamma)
@@ -387,7 +409,7 @@ def compute_robustness_trace(trajs: list,
             va = torch.tensor(va, requires_grad=False).reshape([1, va.shape[0], 1])
             ya_flip = ya.flip(1)
             va_flip = va.flip(1)
-            
+
         if "Jump" in task:
             # Extract x, y, z positions from Ant observations
             xa = obs[:, 0]  # x position
@@ -415,8 +437,11 @@ def compute_robustness_trace(trajs: list,
                 cost_inputs_prefix = ((ya, ya), (va, va))
                 cost_inputs_suffix = ((ya_flip, ya_flip), (va_flip, va_flip))
             if "Jump" in task:
-                cost_inputs_prefix = ((za, za), (ya, ya), (xa, xa))
-                cost_inputs_suffix = ((za_flip, za_flip), (ya_flip, ya_flip), (xa_flip, xa_flip))
+                # Nested structure to match the nested And formula:
+                # Always(And(Negation(ϕ_za), And(And(ϕ_outer_ya, ϕ_outer_xa), Implies(...))))
+                # Inputs: (za_input, (outer_and_input, implies_inputs))
+                cost_inputs_prefix = (za, ((ya, xa), ((ya, xa), (ya, xa))))
+                cost_inputs_suffix = (za_flip, ((ya_flip, xa_flip), ((ya_flip, xa_flip), (ya_flip, xa_flip))))
             
             # cost_rob_prefix
             cost_rob_prefix = ϕ_cost.forward(cost_inputs_prefix, pscale, scale)
