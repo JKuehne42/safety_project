@@ -100,8 +100,10 @@ def train(args: CDTTrainConfig):
             ϕ_xa = And(LessThan(lhs='xa', val=x_lim), GreaterThan(lhs='xa', val=-x_lim))
 
             # ϕ_cost = Always(Implies(Negation(ϕ_xa), Eventually(ϕ_xa, interval=[1, 5])))
+
             # Always (not in the boundary implies in the next 5 time steps will be in the boundary)
             ϕ_cost = Always(Implies(Negation(ϕ_xa), Eventually(ϕ_xa, [1, threshold])))
+
             ϕ_reward = None
             
         if "Run" in args.task:
@@ -125,18 +127,19 @@ def train(args: CDTTrainConfig):
             ϕ_outer_ya = And(LessThan(lhs='ya', val=y_outer_lim), GreaterThan(lhs='ya', val=-y_outer_lim))
             ϕ_outer_xa = And(LessThan(lhs='xa', val=x_outer_lim), GreaterThan(lhs='xa', val=-x_outer_lim))
             
-            y_inner_lim = 0.05 * 2
-            x_inner_lim = 0.05 * 2
-            ϕ_inner_ya = And(LessThan(lhs='ya', val=y_inner_lim), GreaterThan(lhs='ya', val=-y_inner_lim))
-            ϕ_inner_xa = And(LessThan(lhs='xa', val=x_inner_lim), GreaterThan(lhs='xa', val=-x_inner_lim))
+            # y_inner_lim = 0.05 * 2
+            # x_inner_lim = 0.05 * 2
+            # ϕ_inner_ya = And(LessThan(lhs='ya', val=y_inner_lim), GreaterThan(lhs='ya', val=-y_inner_lim))
+            # ϕ_inner_xa = And(LessThan(lhs='xa', val=x_inner_lim), GreaterThan(lhs='xa', val=-x_inner_lim))
 
             # The ant starts centered at 0.25. If it reaches 0, it dies. Prevent this from happening with wiggle room
             z_min = 0.05
             ϕ_za = LessThan(lhs="za", val=z_min)
 
             # Always (Not less than minimum height and ([in the outer boundary] and (not in the inner boundary implies will be in the inner boundary in the next 10 time steps)))
-            ϕ_cost = Always(And(Negation(ϕ_za), And( And(ϕ_outer_ya, ϕ_outer_xa), Implies(Negation( And(ϕ_inner_ya, ϕ_inner_xa)), Eventually(And(ϕ_inner_ya, ϕ_inner_xa), [1, threshold])))))
-            
+            # ϕ_cost = Always(And(Negation(ϕ_za), And( And(ϕ_outer_ya, ϕ_outer_xa), Implies(Negation( And(ϕ_inner_ya, ϕ_inner_xa)), Eventually(And(ϕ_inner_ya, ϕ_inner_xa), [1, threshold])))))
+            Always(And(Negation(ϕ_za), And(ϕ_outer_ya, ϕ_outer_xa)))
+
             # GreaterThan(lhs="va", val=0.1), [1, threshold]
             desired_za = 0.001
             ϕ_in_air = GreaterThan(lhs='za', val=desired_za)

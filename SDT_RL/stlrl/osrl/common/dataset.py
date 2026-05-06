@@ -437,11 +437,11 @@ def compute_robustness_trace(trajs: list,
                 cost_inputs_prefix = ((ya, ya), (va, va))
                 cost_inputs_suffix = ((ya_flip, ya_flip), (va_flip, va_flip))
             if "Jump" in task:
-                # Nested structure to match the nested And formula:
-                # Always(And(Negation(ϕ_za), And(And(ϕ_outer_ya, ϕ_outer_xa), Implies(...))))
-                # Inputs: (za_input, (outer_and_input, implies_inputs))
-                cost_inputs_prefix = (za, ((ya, xa), ((ya, xa), (ya, xa))))
-                cost_inputs_suffix = (za_flip, ((ya_flip, xa_flip), ((ya_flip, xa_flip), (ya_flip, xa_flip))))
+                # Simplified structure for Jump: Always(And(Negation(ϕ_za), And(ϕ_outer_ya, ϕ_outer_xa)))
+                # Outer And inputs: (negation_input, and_input)
+                # Inner And inputs: (ya_input, xa_input)
+                cost_inputs_prefix = (za, ((ya, ya), (xa, xa)))
+                cost_inputs_suffix = (za_flip, ((ya_flip, ya_flip), (xa_flip, xa_flip)))
             
             # cost_rob_prefix
             cost_rob_prefix = ϕ_cost.forward(cost_inputs_prefix, pscale, scale)
